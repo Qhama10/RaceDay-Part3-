@@ -1,0 +1,22 @@
+@{
+    ViewData["Title"] = (string)ViewBag.Title;
+    var user = Context.Session.CurrentUser();
+}
+
+<div class="rd-empty">
+    <p class="rd-eyebrow">Error @ViewBag.Code</p>
+    <h1>@ViewBag.Title</h1>
+    <p class="mb-4">@ViewBag.Message</p>
+    @if (user is { IsOrganiser: true })
+    {
+        <a class="btn btn-primary rd-btn-pill" asp-controller="Organiser" asp-action="Dashboard">Back to my dashboard</a>
+    }
+    else if (user != null)
+    {
+        <a class="btn btn-primary rd-btn-pill" asp-controller="Home" asp-action="Index">Back to upcoming events</a>
+    }
+    else
+    {
+        <a class="btn btn-primary rd-btn-pill" asp-controller="Account" asp-action="Login">Go to log in</a>
+    }
+</div>

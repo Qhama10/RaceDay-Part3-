@@ -1,0 +1,78 @@
+@model EnrolmentsPageViewModel
+@{
+    ViewData["Title"] = "Enter results";
+}
+
+<div class="rd-page-title">
+    <div>
+        <p class="rd-eyebrow mb-1">Results entry</p>
+        <h1>@Model.EventName</h1>
+        <p class="text-muted mb-0">Enter a finish time (hh:mm:ss) and/or a finishing position, then save each row to publish it to the participant.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a class="btn btn-outline-primary rd-btn-pill" asp-action="Enrolments" asp-route-eventId="@Model.EventId">View enrolments</a>
+        <a class="btn btn-outline-secondary rd-btn-pill" asp-action="Events">Back</a>
+    </div>
+</div>
+
+@if (Model.Enrolments.Count == 0)
+{
+    <div class="rd-empty rd-panel">
+        <h3>No participants to record</h3>
+        <p class="mb-0">Results can be entered once participants have enrolled.</p>
+    </div>
+}
+else
+{
+    <div class="rd-panel p-0">
+        <div class="table-responsive">
+            <table class="table rd-table">
+                <thead>
+                    <tr>
+                        <th class="ps-4">Participant</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                        <th style="min-width:140px">Finish time</th>
+                        <th style="min-width:110px">Position</th>
+                        <th style="min-width:180px">Notes</th>
+                        <th class="pe-4"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var e in Model.Enrolments)
+                    {
+                        var fid = "result-" + e.EnrolmentId;
+                        <tr>
+                            <td class="ps-4 fw-semibold">
+                                @* An empty form element: the inputs in this row belong to it through their "form" attribute. *@
+                                <form asp-action="SaveResult" method="post" id="@fid">
+                                    <input type="hidden" name="EnrolmentId" value="@e.EnrolmentId" />
+                                    <input type="hidden" name="EventId" value="@Model.EventId" />
+                                </form>
+                                @e.ParticipantName
+                                <div class="small text-muted fw-normal">@e.ParticipantEmail</div>
+                            </td>
+                            <td>@e.CategoryName</td>
+                            <td><partial name="_StatusBadge" model="e.Status" /></td>
+                            <td>
+                                <input form="@fid" name="FinishTime" class="form-control form-control-sm" placeholder="01:23:45"
+                                       value="@(e.FinishTime.HasValue ? Fmt.Time(e.FinishTime) : "")"
+                                       pattern="\d{1,2}:[0-5]\d:[0-5]\d" title="Use hh:mm:ss, for example 01:23:45" aria-label="Finish time for @e.ParticipantName" />
+                            </td>
+                            <td>
+                                <input form="@fid" name="Position" type="number" min="1" class="form-control form-control-sm" placeholder="1"
+                                       value="@(e.Position.HasValue ? e.Position.Value.ToString() : "")" aria-label="Position for @e.ParticipantName" />
+                            </td>
+                            <td>
+                                <input form="@fid" name="Notes" class="form-control form-control-sm" maxlength="500" placeholder="Optional" aria-label="Notes for @e.ParticipantName" />
+                            </td>
+                            <td class="pe-4 text-end">
+                                <button type="submit" form="@fid" class="btn btn-sm btn-primary rd-btn-pill">Save</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

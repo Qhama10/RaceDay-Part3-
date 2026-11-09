@@ -1,0 +1,55 @@
+@model EnrolmentsPageViewModel
+@{
+    ViewData["Title"] = "Enrolments";
+}
+
+<div class="rd-page-title">
+    <div>
+        <p class="rd-eyebrow mb-1">Enrolments</p>
+        <h1>@Model.EventName</h1>
+        <p class="text-muted mb-0">@Model.Enrolments.Count @(Model.Enrolments.Count == 1 ? "enrolment" : "enrolments")</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-outline-primary rd-btn-pill" asp-action="ExportEnrolments" asp-route-eventId="@Model.EventId">Export CSV</a>
+        <a class="btn btn-primary rd-btn-pill" asp-action="Results" asp-route-eventId="@Model.EventId">Enter results</a>
+        <a class="btn btn-outline-secondary rd-btn-pill" asp-action="Events">Back</a>
+    </div>
+</div>
+
+@if (Model.Enrolments.Count == 0)
+{
+    <div class="rd-empty rd-panel">
+        <h3>Nobody has enrolled yet</h3>
+        <p class="mb-0">Participants will appear here as soon as they enrol.</p>
+    </div>
+}
+else
+{
+    <div class="rd-panel p-0">
+        <div class="table-responsive">
+            <table class="table rd-table">
+                <thead>
+                    <tr>
+                        <th class="ps-4">Participant</th>
+                        <th>Email</th>
+                        <th>Category</th>
+                        <th>Enrolled on</th>
+                        <th class="pe-4">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var e in Model.Enrolments)
+                    {
+                        <tr>
+                            <td class="ps-4 fw-semibold">@e.ParticipantName</td>
+                            <td>@e.ParticipantEmail</td>
+                            <td>@e.CategoryName</td>
+                            <td>@Fmt.DateTimeShort(e.EnrolmentDate)</td>
+                            <td class="pe-4"><partial name="_StatusBadge" model="e.Status" /></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

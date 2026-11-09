@@ -1,0 +1,19 @@
+@model EventDto
+<article class="card rd-card h-100">
+    <a asp-controller="Home" asp-action="Details" asp-route-id="@Model.EventId" class="rd-card-media" tabindex="-1" aria-hidden="true">
+        @if (!string.IsNullOrWhiteSpace(Model.BannerUrl))
+        {
+            <img src="@Model.BannerUrl" alt="" loading="lazy" onerror="this.style.display='none'" />
+        }
+        <span class="rd-type-tag">@Model.EventType</span>
+    </a>
+    <div class="card-body d-flex flex-column">
+        <p class="rd-date mb-1">@Fmt.Date(Model.EventDate)</p>
+        <h3 class="rd-card-title">
+            <a asp-controller="Home" asp-action="Details" asp-route-id="@Model.EventId">@Model.EventName</a>
+        </h3>
+        <p class="text-muted mb-3">@Model.EventLocation &middot; @Fmt.Distance(Model.Distance)</p>
+        <a asp-controller="Home" asp-action="Details" asp-route-id="@Model.EventId"
+           class="btn btn-primary rd-btn-pill mt-auto align-self-start">View event</a>
+    </div>
+</article>

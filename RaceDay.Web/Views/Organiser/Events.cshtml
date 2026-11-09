@@ -1,0 +1,76 @@
+@model List<EventSummaryDto>
+@{
+    ViewData["Title"] = "My events";
+}
+
+<div class="rd-page-title">
+    <div>
+        <p class="rd-eyebrow mb-1">Organiser</p>
+        <h1>My events</h1>
+    </div>
+    <a class="btn btn-primary rd-btn-pill" asp-action="CreateEvent">Create event</a>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="rd-empty rd-panel">
+        <h3>No events yet</h3>
+        <p class="mb-3">Create your first event to get started.</p>
+        <a class="btn btn-primary rd-btn-pill" asp-action="CreateEvent">Create an event</a>
+    </div>
+}
+else
+{
+    <div class="rd-panel p-0">
+        <div class="table-responsive">
+            <table class="table rd-table">
+                <thead>
+                    <tr>
+                        <th class="ps-4" style="width:80px"></th>
+                        <th>Event</th>
+                        <th>Date</th>
+                        <th>Location</th>
+                        <th>Type</th>
+                        <th class="text-center">Enrolments</th>
+                        <th class="pe-4 text-end">Manage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var e in Model)
+                    {
+                        <tr>
+                            <td class="ps-4">
+                                @if (!string.IsNullOrWhiteSpace(e.BannerUrl))
+                                {
+                                    <img src="@e.BannerUrl" alt="" class="rd-thumb" loading="lazy" />
+                                }
+                                else
+                                {
+                                    <div class="rd-thumb-fallback" aria-hidden="true"></div>
+                                }
+                            </td>
+                            <td class="fw-semibold">
+                                <a asp-controller="Home" asp-action="Details" asp-route-id="@e.EventId" class="text-decoration-none">@e.EventName</a>
+                                <div class="small text-muted fw-normal">@Fmt.Distance(e.Distance) &middot; @e.CategoryCount @(e.CategoryCount == 1 ? "category" : "categories")</div>
+                            </td>
+                            <td>@Fmt.Date(e.EventDate)</td>
+                            <td>@e.EventLocation</td>
+                            <td>@e.EventType</td>
+                            <td class="text-center"><span class="rd-time">@e.EnrolmentCount</span></td>
+                            <td class="pe-4 text-end text-nowrap">
+                                <a class="btn btn-sm btn-outline-primary rd-btn-pill" asp-action="EditEvent" asp-route-id="@e.EventId">Edit</a>
+                                <a class="btn btn-sm btn-outline-primary rd-btn-pill" asp-action="Categories" asp-route-eventId="@e.EventId">Categories</a>
+                                <a class="btn btn-sm btn-outline-primary rd-btn-pill" asp-action="Enrolments" asp-route-eventId="@e.EventId">Enrolments</a>
+                                <a class="btn btn-sm btn-outline-primary rd-btn-pill" asp-action="Results" asp-route-eventId="@e.EventId">Results</a>
+                                <form asp-action="DeleteEvent" asp-route-id="@e.EventId" method="post" class="d-inline"
+                                      onsubmit="return confirm('Delete this event? This also removes its categories, enrolments and results.');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger rd-btn-pill">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

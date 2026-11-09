@@ -1,0 +1,94 @@
+@model CategoriesPageViewModel
+@{
+    ViewData["Title"] = "Categories";
+    var ev = Model.Event;
+}
+
+<div class="rd-page-title">
+    <div>
+        <p class="rd-eyebrow mb-1">Categories</p>
+        <h1>@ev.EventName</h1>
+        <p class="text-muted mb-0">@Fmt.Date(ev.EventDate) &middot; @ev.EventLocation</p>
+    </div>
+    <a class="btn btn-outline-secondary rd-btn-pill" asp-action="Events">Back to my events</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="rd-panel">
+            <h3 class="mb-3">Current categories</h3>
+            @if (ev.Categories.Count == 0)
+            {
+                <p class="text-muted mb-0">No categories yet. Add an age or distance category using the form.</p>
+            }
+            else
+            {
+                <div class="d-grid gap-3">
+                    @foreach (var c in ev.Categories)
+                    {
+                        <div class="border rounded-3 p-3 bg-white">
+                            <form asp-action="EditCategory" method="post" id="edit-@c.CategoryId">
+                                <input type="hidden" name="EventId" value="@ev.EventId" />
+                                <input type="hidden" name="CategoryId" value="@c.CategoryId" />
+                                <div class="row g-2">
+                                    <div class="col-md-4">
+                                        <label class="form-label small mb-1" for="n-@c.CategoryId">Name</label>
+                                        <input id="n-@c.CategoryId" name="CategoryName" class="form-control form-control-sm" value="@c.CategoryName" maxlength="100" required />
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label class="form-label small mb-1" for="d-@c.CategoryId">Description</label>
+                                        <input id="d-@c.CategoryId" name="CategoryDescription" class="form-control form-control-sm" value="@c.CategoryDescription" maxlength="250" required />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small mb-1" for="x-@c.CategoryId">Distance</label>
+                                        <input id="x-@c.CategoryId" name="CategoryDistance" class="form-control form-control-sm" value="@c.CategoryDistance" maxlength="250" required />
+                                    </div>
+                                </div>
+                            </form>
+                            <form asp-action="DeleteCategory" method="post" id="del-@c.CategoryId"
+                                  onsubmit="return confirm('Delete this category? Enrolments in it will be removed too.');">
+                                <input type="hidden" name="categoryId" value="@c.CategoryId" />
+                                <input type="hidden" name="eventId" value="@ev.EventId" />
+                            </form>
+                            <div class="d-flex gap-2 mt-3">
+                                <button type="submit" form="edit-@c.CategoryId" class="btn btn-sm btn-outline-primary rd-btn-pill">Save changes</button>
+                                <button type="submit" form="del-@c.CategoryId" class="btn btn-sm btn-outline-danger rd-btn-pill">Delete</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="rd-panel">
+            <h3 class="mb-3">Add a category</h3>
+            <form asp-action="AddCategory" method="post" novalidate>
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger rd-alert"></div>
+                <input type="hidden" asp-for="NewCategory.EventId" value="@ev.EventId" />
+
+                <div class="mb-3">
+                    <label asp-for="NewCategory.CategoryName" class="form-label"></label>
+                    <input asp-for="NewCategory.CategoryName" class="form-control" placeholder="e.g. Under 18" />
+                    <span asp-validation-for="NewCategory.CategoryName" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="NewCategory.CategoryDescription" class="form-label"></label>
+                    <input asp-for="NewCategory.CategoryDescription" class="form-control" placeholder="e.g. Ages 13 to 17" />
+                    <span asp-validation-for="NewCategory.CategoryDescription" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="NewCategory.CategoryDistance" class="form-label"></label>
+                    <input asp-for="NewCategory.CategoryDistance" class="form-control" placeholder="e.g. 10 km" />
+                    <span asp-validation-for="NewCategory.CategoryDistance" class="text-danger"></span>
+                </div>
+                <button type="submit" class="btn btn-primary rd-btn-pill w-100">Add category</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

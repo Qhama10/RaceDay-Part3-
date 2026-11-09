@@ -1,0 +1,21 @@
+## .NET / Visual Studio
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.userprefs
+*.rsuser
+launchSettings.json.bak
+
+## Secrets: never commit these
+appsettings.Local.json
+appsettings.*.local.json
+secrets.json
+.env
+
+## OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

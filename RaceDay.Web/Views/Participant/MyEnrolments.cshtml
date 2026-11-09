@@ -1,0 +1,57 @@
+@model List<EnrolmentDto>
+@{
+    ViewData["Title"] = "My enrolments";
+}
+
+<div class="rd-page-title">
+    <div>
+        <p class="rd-eyebrow mb-1">Participant</p>
+        <h1>My enrolments</h1>
+    </div>
+    <a class="btn btn-primary rd-btn-pill" asp-controller="Home" asp-action="Index">Find more events</a>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="rd-empty rd-panel">
+        <h3>You have not enrolled in anything yet</h3>
+        <p class="mb-3">Pick an event and choose a category to get on the start list.</p>
+        <a class="btn btn-primary rd-btn-pill" asp-controller="Home" asp-action="Index">Browse upcoming events</a>
+    </div>
+}
+else
+{
+    <div class="rd-panel p-0">
+        <div class="table-responsive">
+            <table class="table rd-table align-middle">
+                <thead>
+                    <tr>
+                        <th class="ps-4">Event</th>
+                        <th>Category</th>
+                        <th>Enrolled on</th>
+                        <th class="pe-4">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var e in Model)
+                    {
+                        <tr>
+                            <td class="ps-4">
+                                <a asp-controller="Home" asp-action="Details" asp-route-id="@e.EventId" class="fw-semibold text-decoration-none">@e.EventName</a>
+                            </td>
+                            <td>@e.CategoryName</td>
+                            <td>@Fmt.DateTimeShort(e.EnrolmentDate)</td>
+                            <td class="pe-4"><partial name="_StatusBadge" model="e.Status" /></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <p class="text-muted small mt-3 mb-0">
+        <span class="rd-status rd-status-amber">Registered</span> you are on the start list &nbsp;
+        <span class="rd-status rd-status-green">Completed</span> your result has been recorded &nbsp;
+        <span class="rd-status rd-status-grey">Withdrawn</span> no longer taking part
+    </p>
+}

@@ -1,0 +1,122 @@
+@model EventDetailsViewModel
+@{
+    var ev = Model.Event;
+    ViewData["Title"] = ev.EventName;
+    var user = Context.Session.CurrentUser();
+    var isPast = ev.EventDate < DateOnly.FromDateTime(DateTime.Today);
+}
+
+<a href="@(user?.IsOrganiser == true ? Url.Action("Dashboard", "Organiser") : Url.Action("Index", "Home"))" class="text-decoration-none">&larr; Back</a>
+
+<div class="rd-banner mt-3">
+    @if (!string.IsNullOrWhiteSpace(ev.BannerUrl))
+    {
+        <img src="@ev.BannerUrl" alt="Banner image for @ev.EventName" onerror="this.style.display='none'" />
+    }
+    <div class="rd-banner-text">
+        <span class="rd-chip">@ev.EventType</span>
+        <h1 class="text-white mb-2">@ev.EventName</h1>
+        <span class="rd-chip">@Fmt.Date(ev.EventDate)</span>
+        <span class="rd-chip">@ev.EventLocation</span>
+        <span class="rd-chip">@Fmt.Distance(ev.Distance)</span>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="rd-panel mb-4">
+            <h3 class="mb-3">About this event</h3>
+            @if (string.IsNullOrWhiteSpace(ev.EventDescription))
+            {
+                <p class="text-muted mb-0">The organiser has not added a description yet.</p>
+            }
+            else
+            {
+                <p class="mb-0" style="white-space: pre-line;">@ev.EventDescription</p>
+            }
+        </div>
+
+        <div class="rd-panel">
+            <h3 class="mb-3">Categories</h3>
+            @if (ev.Categories.Count == 0)
+            {
+                <p class="text-muted mb-0">No categories have been added to this event yet.</p>
+            }
+            else
+            {
+                <div class="d-grid gap-2">
+                    @foreach (var c in ev.Categories)
+                    {
+                        <div class="border rounded-3 p-3 bg-white">
+                            <div class="d-flex justify-content-between flex-wrap gap-2">
+                                <strong>@c.CategoryName</strong>
+                                <span class="text-muted">@c.CategoryDistance</span>
+                            </div>
+                            <div class="text-muted">@c.CategoryDescription</div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="rd-panel">
+            @if (user is { IsParticipant: true })
+            {
+                <h3 class="mb-3">Enrol</h3>
+                @if (Model.MyEnrolment != null)
+                {
+                    <p class="mb-2">You are enrolled in <strong>@Model.MyEnrolment.CategoryName</strong>.</p>
+                    <p class="mb-3"><partial name="_StatusBadge" model="Model.MyEnrolment.Status" /></p>
+                    <a asp-controller="Participant" asp-action="MyEnrolments" class="btn btn-outline-primary rd-btn-pill">View my enrolments</a>
+                }
+                else if (isPast)
+                {
+                    <p class="text-muted mb-0">This event has already taken place, so enrolment is closed.</p>
+                }
+                else if (ev.Categories.Count == 0)
+                {
+                    <p class="text-muted mb-0">Enrolment opens once the organiser adds categories.</p>
+                }
+                else
+                {
+                    <form asp-controller="Participant" asp-action="Enrol" method="post">
+                        <input type="hidden" name="eventId" value="@ev.EventId" />
+                        <fieldset>
+                            <legend class="form-label">Choose your category</legend>
+                            <div class="d-grid gap-2 mb-3">
+                                @foreach (var c in ev.Categories)
+                                {
+                                    <div class="position-relative">
+                                        <input class="rd-category-input" type="radio" name="categoryId" id="cat-@c.CategoryId" value="@c.CategoryId" required />
+                                        <label class="rd-category" for="cat-@c.CategoryId">
+                                            <strong>@c.CategoryName</strong>
+                                            <span class="text-muted d-block">@c.CategoryDescription &middot; @c.CategoryDistance</span>
+                                        </label>
+                                    </div>
+                                }
+                            </div>
+                        </fieldset>
+                        <button type="submit" class="btn btn-primary rd-btn-pill w-100 py-2">Enrol now</button>
+                    </form>
+                }
+            }
+            else if (Model.IsOwner)
+            {
+                <h3 class="mb-3">Manage this event</h3>
+                <div class="d-grid gap-2">
+                    <a class="btn btn-primary rd-btn-pill" asp-controller="Organiser" asp-action="EditEvent" asp-route-id="@ev.EventId">Edit event</a>
+                    <a class="btn btn-outline-primary rd-btn-pill" asp-controller="Organiser" asp-action="Categories" asp-route-eventId="@ev.EventId">Manage categories</a>
+                    <a class="btn btn-outline-primary rd-btn-pill" asp-controller="Organiser" asp-action="Enrolments" asp-route-eventId="@ev.EventId">View enrolments</a>
+                    <a class="btn btn-outline-primary rd-btn-pill" asp-controller="Organiser" asp-action="Results" asp-route-eventId="@ev.EventId">Enter results</a>
+                </div>
+            }
+            else
+            {
+                <h3 class="mb-2">Organiser view</h3>
+                <p class="text-muted mb-0">This event belongs to another organiser.</p>
+            }
+        </div>
+    </div>
+</div>

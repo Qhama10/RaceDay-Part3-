@@ -1,0 +1,90 @@
+@model ProfileViewModel
+@{
+    ViewData["Title"] = "My profile";
+    var isParticipant = Model.Role == "Participant";
+}
+
+<div class="rd-page-title">
+    <div>
+        <p class="rd-eyebrow mb-1">@Model.Role</p>
+        <h1>My profile</h1>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="rd-panel text-center">
+            @if (!string.IsNullOrWhiteSpace(Model.ProfilePictureUrl))
+            {
+                <img src="@Model.ProfilePictureUrl" alt="Your profile picture" class="rd-avatar mb-3" />
+            }
+            else
+            {
+                <div class="rd-avatar-fallback mx-auto mb-3" aria-hidden="true">@Fmt.Initials(Model.FullName)</div>
+            }
+            <h3 class="mb-0">@Model.FullName</h3>
+            <p class="text-muted">@Model.Email</p>
+
+            <form asp-action="UploadPicture" method="post" enctype="multipart/form-data" class="text-start">
+                <label for="picture" class="form-label">Profile picture</label>
+                <input type="file" id="picture" name="picture" class="form-control mb-2" accept="image/png,image/jpeg,image/webp" required />
+                <div class="form-text mb-3">JPG, PNG or WEBP, up to 5 MB.</div>
+                <button type="submit" class="btn btn-outline-primary rd-btn-pill w-100">Upload picture</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="rd-panel">
+            <h3 class="mb-3">Personal information</h3>
+            <form asp-action="Profile" method="post" novalidate>
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger rd-alert"></div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="FullName" class="form-label"></label>
+                        <input asp-for="FullName" class="form-control" />
+                        <span asp-validation-for="FullName" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="email-readonly">Email</label>
+                        <input id="email-readonly" class="form-control" value="@Model.Email" disabled />
+                    </div>
+
+                    @if (isParticipant)
+                    {
+                        <div class="col-md-6">
+                            <label asp-for="Username" class="form-label"></label>
+                            <input asp-for="Username" class="form-control" />
+                            <span asp-validation-for="Username" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="DateOfBirth" class="form-label"></label>
+                            <input asp-for="DateOfBirth" type="date" class="form-control" />
+                            <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-md-6">
+                            <label asp-for="OrganisationName" class="form-label"></label>
+                            <input asp-for="OrganisationName" class="form-control" />
+                            <span asp-validation-for="OrganisationName" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="ContactPhone" class="form-label"></label>
+                            <input asp-for="ContactPhone" class="form-control" />
+                            <span asp-validation-for="ContactPhone" class="text-danger"></span>
+                        </div>
+                    }
+                </div>
+
+                <button type="submit" class="btn btn-primary rd-btn-pill mt-4">Save changes</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

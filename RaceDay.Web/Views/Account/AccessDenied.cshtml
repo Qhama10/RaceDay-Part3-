@@ -1,0 +1,22 @@
+@{
+    ViewData["Title"] = "Access denied";
+    var user = Context.Session.CurrentUser();
+}
+
+<div class="rd-empty">
+    <p class="rd-eyebrow">403</p>
+    <h1>Off the course</h1>
+    <p class="mb-4">Your account does not have access to that page.</p>
+    @if (user is { IsOrganiser: true })
+    {
+        <a class="btn btn-primary rd-btn-pill" asp-controller="Organiser" asp-action="Dashboard">Back to my dashboard</a>
+    }
+    else if (user != null)
+    {
+        <a class="btn btn-primary rd-btn-pill" asp-controller="Home" asp-action="Index">Back to upcoming events</a>
+    }
+    else
+    {
+        <a class="btn btn-primary rd-btn-pill" asp-controller="Account" asp-action="Login">Log in</a>
+    }
+</div>

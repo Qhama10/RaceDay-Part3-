@@ -1,0 +1,117 @@
+@model List<EventSummaryDto>
+@{
+    ViewData["Title"] = "Dashboard";
+    var today = DateOnly.FromDateTime(DateTime.Today);
+    var upcoming = Model.Where(e => e.EventDate >= today).OrderBy(e => e.EventDate).ToList();
+    var past = Model.Where(e => e.EventDate < today).OrderByDescending(e => e.EventDate).ToList();
+    var totalEnrolments = Model.Sum(e => e.EnrolmentCount);
+    var name = Context.Session.CurrentUser()?.Name ?? "";
+}
+
+<section class="rd-hero">
+    <p class="rd-eyebrow text-white-50 mb-2">Organiser dashboard</p>
+    <h1 class="mb-2">Race control, <span>@name</span></h1>
+    <p>Everything you have created, who has entered, and what is coming up next.</p>
+</section>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="rd-stat"><div class="rd-stat-num">@Model.Count</div><div class="rd-stat-label">Events created</div></div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="rd-stat"><div class="rd-stat-num">@totalEnrolments</div><div class="rd-stat-label">Total enrolments</div></div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="rd-stat"><div class="rd-stat-num">@upcoming.Count</div><div class="rd-stat-label">Upcoming events</div></div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="rd-stat rd-stat-volt">
+            <div class="rd-stat-num">@(upcoming.Count > 0 ? upcoming[0].EventDate.ToString("d MMM", System.Globalization.CultureInfo.InvariantCulture) : "-")</div>
+            <div class="rd-stat-label">Next event date</div>
+        </div>
+    </div>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="rd-empty rd-panel">
+        <h3>No events yet</h3>
+        <p class="mb-3">Create your first event to start collecting enrolments.</p>
+        <a class="btn btn-primary rd-btn-pill" asp-action="CreateEvent">Create an event</a>
+    </div>
+}
+else
+{
+    <div class="rd-page-title">
+        <h2>Upcoming events</h2>
+        <a class="btn btn-primary rd-btn-pill" asp-action="CreateEvent">Create event</a>
+    </div>
+
+    @if (upcoming.Count == 0)
+    {
+        <div class="rd-panel text-muted mb-4">You have no upcoming events.</div>
+    }
+    else
+    {
+        <div class="rd-panel p-0 mb-4">
+            <div class="table-responsive">
+                <table class="table rd-table">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Event</th><th>Date</th><th>Location</th>
+                            <th class="text-center">Categories</th><th class="text-center">Enrolments</th><th class="pe-4"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var e in upcoming)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-semibold">
+                                    <a asp-controller="Home" asp-action="Details" asp-route-id="@e.EventId" class="text-decoration-none">@e.EventName</a>
+                                </td>
+                                <td>@Fmt.Date(e.EventDate)</td>
+                                <td>@e.EventLocation</td>
+                                <td class="text-center">@e.CategoryCount</td>
+                                <td class="text-center"><span class="rd-time">@e.EnrolmentCount</span></td>
+                                <td class="pe-4 text-end">
+                                    <a class="btn btn-sm btn-outline-primary rd-btn-pill" asp-action="Enrolments" asp-route-eventId="@e.EventId">Enrolments</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
+    @if (past.Count > 0)
+    {
+        <div class="rd-page-title"><h2>Past events</h2></div>
+        <div class="rd-panel p-0">
+            <div class="table-responsive">
+                <table class="table rd-table">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Event</th><th>Date</th><th>Location</th>
+                            <th class="text-center">Enrolments</th><th class="pe-4"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var e in past)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-semibold">@e.EventName</td>
+                                <td>@Fmt.Date(e.EventDate)</td>
+                                <td>@e.EventLocation</td>
+                                <td class="text-center"><span class="rd-time">@e.EnrolmentCount</span></td>
+                                <td class="pe-4 text-end">
+                                    <a class="btn btn-sm btn-primary rd-btn-pill" asp-action="Results" asp-route-eventId="@e.EventId">Enter results</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+}
