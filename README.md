@@ -161,3 +161,7 @@ All additions are backwards compatible with Part 2.
 | "Image storage is not configured on the server" | The `BlobStorage:ConnectionString` secret is missing (step 2). |
 | "The image could not be stored right now" | Check the connection string, and that **Allow Blob anonymous access** is Enabled on the storage account. |
 | Uploaded image does not display | Same setting as above: anonymous blob access must be enabled. |
+
+## Demo video
+
+Watch the demonstration on YouTube: [RaceDay Part 3 demo]https://youtu.be/sD7_ACdzVR4?si=XEixUpJb6xeqHoLY
