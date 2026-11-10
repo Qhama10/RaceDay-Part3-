@@ -113,6 +113,11 @@ namespace Raceday_API__prog_part_2_.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EventId"));
 
+                    b.Property<string>("BannerUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("banner_url");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2")
                         .HasColumnName("created_at");
@@ -202,6 +207,11 @@ namespace Raceday_API__prog_part_2_.Migrations
                         .HasColumnType("nvarchar(100)")
                         .HasColumnName("password_hash");
 
+                    b.Property<string>("ProfilePictureUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("profile_picture_url");
+
                     b.HasKey("OrganiserId");
 
                     b.HasIndex("Email")
@@ -244,6 +254,11 @@ namespace Raceday_API__prog_part_2_.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("password_hash");
+
+                    b.Property<string>("ProfilePictureUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("profile_picture_url");
 
                     b.Property<string>("Username")
                         .IsRequired()
